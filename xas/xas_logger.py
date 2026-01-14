@@ -1,5 +1,9 @@
 import logging
 import logging.handlers
+import os
+import tempfile
+from pathlib import Path
+
 
 def add_new_print_to_logger(logger, print_func):
     info_func = logger.info
@@ -11,8 +15,16 @@ def add_new_print_to_logger(logger, print_func):
     logger.info = new_info_func
 
 
+if os.getenv("TEST"):
+    tempdir = tempfile.TemporaryDirectory()
+    SHARED_PATH = tempdir.name
+    Path(tempdir.name, "log").mkdir()
+else:
+    SHARED_PATH = '/nsls2/data/iss/legacy/xf08id'
 
-def get_logger(print_func=None, shared_path='/nsls2/data/iss/legacy/xf08id'):
+
+
+def get_logger(print_func=None, shared_path=SHARED_PATH):
     # Setup beamline specifics:
     # shared_path = '/nsls2/xf08id'
 
