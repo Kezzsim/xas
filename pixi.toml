@@ -6,10 +6,10 @@ platforms = ["linux-64"]
 version = "0.1.0"
 
 [tasks]
-test = "python test.py"
+test = { cmd = "python test.py", env = { TEST = "1" } }
 
 [pypi-dependencies]
-xas = { path = "." }
+xas = { path = ".", editable = true }
 
 [dependencies]
 python = ">=3.12,<3.14"

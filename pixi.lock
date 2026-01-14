@@ -477,7 +477,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/zlib-ng-2.3.2-hceb46e0_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/zstandard-0.25.0-py313h54dd161_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/zstd-1.5.7-hb78ec9c_6.conda
-      - pypi: git+https://github.com/NSLS-II-ISS/xas?rev=main#4a9818c3cc35b1aef293c49fbe9110a9dbb219e2
+      - pypi: ./
 packages:
 - conda: https://conda.anaconda.org/conda-forge/linux-64/_libgcc_mutex-0.1-conda_forge.tar.bz2
   sha256: fe51de6107f9edc7aa4f786a70f4a883943bc9d39b3bb7307c04c41410990726
@@ -6878,9 +6878,11 @@ packages:
   - pkg:pypi/xarray?source=hash-mapping
   size: 994025
   timestamp: 1764974555156
-- pypi: git+https://github.com/NSLS-II-ISS/xas?rev=main#4a9818c3cc35b1aef293c49fbe9110a9dbb219e2
+- pypi: ./
   name: xas
-  version: 0.0.1.post411+g4a9818c
+  version: 0.0.1.post413.dev0+gfada11b
+  sha256: 12e972dce3b86f1200480f84ecd29a5b0dff210353f2bcb99962f05e64e1031b
+  editable: true
 - conda: https://conda.anaconda.org/conda-forge/linux-64/xcb-util-0.4.1-h4f16b4b_2.conda
   sha256: ad8cab7e07e2af268449c2ce855cbb51f43f4664936eff679b1f3862e6e4b01d
   md5: fdc27cb255a7a2cc73b7919a968b48f0
