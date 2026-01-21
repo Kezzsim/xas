@@ -131,17 +131,17 @@ def get_processed_df_from_uid(uid, db, logger=None, draw_func_interp=None, draw_
     experiment = hdr.start['experiment']
     if experiment in _legacy_experiment_reg.keys(): experiment = _legacy_experiment_reg[experiment]
     comments = create_file_header(hdr)
-    if (processing_kwargs is not None) and ('interp_filename' in processing_kwargs):
-        path_to_file = processing_kwargs['interp_filename']
-    else:
-        path_to_file = hdr.start['interp_filename']
-    path_to_file = _shift_root(path_to_file)
-    validate_path_exists(path_to_file)
-    path_to_file = validate_file_exists(path_to_file, file_type='interp')
+    # if (processing_kwargs is not None) and ('interp_filename' in processing_kwargs):
+    #     path_to_file = processing_kwargs['interp_filename']
+    # else:
+    #     path_to_file = hdr.start['interp_filename']
+    # path_to_file = _shift_root(path_to_file)
+    # validate_path_exists(path_to_file)
+    # path_to_file = validate_file_exists(path_to_file, file_type='interp')
     e0 = find_e0(hdr)
     data_kind = 'default'
     file_list = []
-    logger.info(f'({ttime.ctime()}) Processing started for {uid}/{path_to_file}')
+    logger.info(f'({ttime.ctime()}) Processing started for {uid}')
     if experiment == 'fly_scan':
         logger.info(f'({ttime.ctime()}) Processing fly scan')
         stream_names = hdr.stream_names
@@ -191,11 +191,12 @@ def get_processed_df_from_uid(uid, db, logger=None, draw_func_interp=None, draw_
             else:
                 interpolated_df = interpolate(raw_dict)
 
-            logger.info(f'({ttime.ctime()}) Interpolation successful for {path_to_file}')
+            logger.info(f'({ttime.ctime()}) Interpolation successful for {uid}')
             if save_interpolated_file:
-                save_interpolated_df_as_file(path_to_file, interpolated_df, comments)
+                breakpoint()
+                save_interpolated_df_as_file(uid, interpolated_df, comments)
         except Exception as e:
-            logger.info(f'({ttime.ctime()}) Interpolation failed for {path_to_file}')
+            logger.info(f'({ttime.ctime()}) Interpolation failed for {uid}')
             raise e
 
         try:
@@ -203,9 +204,9 @@ def get_processed_df_from_uid(uid, db, logger=None, draw_func_interp=None, draw_
                 # rebin_kwargs = filter_rebin_kwargs(processing_kwargs)
                 rebin_kwargs = {}
                 processed_df = bin(interpolated_df, e0, **rebin_kwargs)
-                (path, extension) = os.path.splitext(path_to_file)
+                (path, extension) = os.path.splitext(uid)
                 path_to_file = path + '.dat'
-                logger.info(f'({ttime.ctime()}) Binning successful for {path_to_file}')
+                logger.info(f'({ttime.ctime()}) Binning successful for {uid}')
 
                 if draw_func_interp is not None:
                     draw_func_interp(interpolated_df, processed_df)
