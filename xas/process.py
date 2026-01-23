@@ -196,9 +196,7 @@ def get_processed_df_from_uid(uid, db, logger=None, draw_func_interp=None, draw_
 
             logger.info(f'({ttime.ctime()}) Interpolation successful for {uid}')
             if save_interpolated_file:
-                # breakpoint()
                 client.write_table(interpolated_df)
-                # save_interpolated_df_as_file(uid, interpolated_df, comments)
         except Exception as e:
             logger.info(f'({ttime.ctime()}) Interpolation failed for {uid}')
             raise e
