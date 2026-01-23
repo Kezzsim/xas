@@ -25,6 +25,8 @@ from xas.image_analysis import reduce_johann_images
 from xas.vonhamos import process_von_hamos_scan, filter_von_hamos_kwargs #, save_vh_scan_to_file
 import gc
 
+from tiled.client import from_uri
+
 def process_interpolate_bin(doc, db, processing_repo='xas', draw_func_interp = None, draw_func_bin = None, cloud_dispatcher = None,
                             print_func=None, dump_to_tiff=False, load_images=False, processing_kwargs=None,
                             save_image = False, camera1 = None, camera2 = None):
@@ -124,7 +126,8 @@ def get_processed_df_from_uid(uid, db, logger=None, draw_func_interp=None, draw_
     if logger is None:
         logger = get_logger()
 
-        # logger = get_logger(print_func=print_func)
+    client = from_uri("https://tiled.nsls2.bnl.gov")['tst/sandbox/iss/processed']
+    # logger = get_logger(print_func=print_func)
     hdr = db[uid]
     if update_start is not None:
         hdr = update_header_start(hdr, update_start)
@@ -193,8 +196,9 @@ def get_processed_df_from_uid(uid, db, logger=None, draw_func_interp=None, draw_
 
             logger.info(f'({ttime.ctime()}) Interpolation successful for {uid}')
             if save_interpolated_file:
-                breakpoint()
-                save_interpolated_df_as_file(uid, interpolated_df, comments)
+                # breakpoint()
+                client.write_table(interpolated_df)
+                # save_interpolated_df_as_file(uid, interpolated_df, comments)
         except Exception as e:
             logger.info(f'({ttime.ctime()}) Interpolation failed for {uid}')
             raise e
