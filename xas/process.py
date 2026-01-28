@@ -134,10 +134,10 @@ def get_processed_df_from_uid(uid, db, logger=None, draw_func_interp=None, draw_
     experiment = hdr.start['experiment']
     if experiment in _legacy_experiment_reg.keys(): experiment = _legacy_experiment_reg[experiment]
     comments = create_file_header(hdr)
-    # if (processing_kwargs is not None) and ('interp_filename' in processing_kwargs):
-    #     path_to_file = processing_kwargs['interp_filename']
-    # else:
-    #     path_to_file = hdr.start['interp_filename']
+    if (processing_kwargs is not None) and ('interp_filename' in processing_kwargs):
+        path_to_file = processing_kwargs['interp_filename']
+    else:
+        path_to_file = hdr.start['interp_filename']
     # path_to_file = _shift_root(path_to_file)
     # validate_path_exists(path_to_file)
     # path_to_file = validate_file_exists(path_to_file, file_type='interp')
@@ -196,7 +196,7 @@ def get_processed_df_from_uid(uid, db, logger=None, draw_func_interp=None, draw_
 
             logger.info(f'({ttime.ctime()}) Interpolation successful for {uid}')
             if save_interpolated_file:
-                client.write_table(interpolated_df)
+                client.write_table(interpolated_df, key=path_to_file)
         except Exception as e:
             logger.info(f'({ttime.ctime()}) Interpolation failed for {uid}')
             raise e
