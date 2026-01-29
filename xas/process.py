@@ -180,7 +180,7 @@ def get_processed_df_from_uid(uid, db, logger=None, draw_func_interp=None, draw_
                     xia_dict = load_xia_dataset_from_db(db, uid, apb_trigger_xia_timestamps)
                     logger.info(f'({ttime.ctime()}) XIA data received')
                     raw_dict = {**raw_dict, **xia_dict}
-                    pass #WIP for flying Ge detrctor
+                    pass #WIP for flying Ge detector
 
             logger.info(f'({ttime.ctime()}) Streams loaded successfully')
         except Exception as e:
@@ -196,7 +196,7 @@ def get_processed_df_from_uid(uid, db, logger=None, draw_func_interp=None, draw_
 
             logger.info(f'({ttime.ctime()}) Interpolation successful for {uid}')
             if save_interpolated_file:
-                client.write_table(interpolated_df, key=path_to_file)
+                client.write_table(interpolated_df, metadata=dict(hdr.start))
         except Exception as e:
             logger.info(f'({ttime.ctime()}) Interpolation failed for {uid}')
             raise e
