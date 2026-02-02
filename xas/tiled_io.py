@@ -2,7 +2,7 @@ import copy
 
 from tiled.client import from_uri, from_profile
 from tiled.client.node import Node
-from tiled.queries import Key
+from tiled.queries import Key, Contains
 from tiled.client.cache import Cache
 
 import pandas as pd
@@ -269,3 +269,19 @@ def get_unique_value_combinations(node, keys, add_nodes=False):
 def build_scan_tree_table(node: Node, grouping_keys: list[str]):
     table_rows = get_unique_value_combinations(node, grouping_keys, add_nodes=True)
     return pd.DataFrame(table_rows)
+
+def load_interpolated_df_from_tiled(filename):
+    ''' Load interp tiled and return'''
+    client = from_uri("https://tiled.nsls2.bnl.gov")['tst/sandbox/iss/processed']
+
+    search = client.search(Contains("interp_filename", filename))
+    # Handle exception search result container is empty
+    if len(search.items()) == 0:
+        raise ValueError(f"No records containing filename {filename} found in tiled.")
+    else:
+        header = search.values().first()
+    keys = header[header.rfind('#'):][1:-1].split()
+    df = pd.read_csv(filename, delim_whitespace=True, comment='#', names=keys, index_col=False)
+    if 'energy' in [i.lower() for i in df.columns]: # I am not sorry /// Kari
+        df = df.sort_values('energy'.lower())
+    return df, header
