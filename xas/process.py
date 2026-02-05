@@ -11,6 +11,7 @@ from scipy.interpolate import interp1d
 import pandas as pd
 from xas.file_io import _shift_root
 from xas.db_io import update_header_start
+from xas.metadata import generate_xdi_metadata_from_hdr
 from xas.xas_logger import get_logger
 # import matplotlib.pyplot as plt
 # import numpy as np
@@ -196,7 +197,7 @@ def get_processed_df_from_uid(uid, db, logger=None, draw_func_interp=None, draw_
 
             logger.info(f'({ttime.ctime()}) Interpolation successful for {uid}')
             if save_interpolated_file:
-                client.write_table(interpolated_df, metadata=dict(hdr.start))
+                client.write_table(interpolated_df, metadata=generate_xdi_metadata_from_hdr(hdr))
         except Exception as e:
             logger.info(f'({ttime.ctime()}) Interpolation failed for {uid}')
             raise e
