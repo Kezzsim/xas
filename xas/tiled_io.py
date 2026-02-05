@@ -14,6 +14,7 @@ import itertools
 from xas.xdash_math import LarchCalculator, calc_mus
 import uuid
 
+client = from_uri("https://tiled.nsls2.bnl.gov")['tst/sandbox/iss/processed']
 
 _LABEL_DICT = {'mu': 'mu',
                'normalized': 'mu norm',
@@ -273,16 +274,15 @@ def build_scan_tree_table(node: Node, grouping_keys: list[str]):
 
 def load_interpolated_df_from_tiled(filename):
     ''' Load interp tiled and return'''
-    client = from_uri("https://tiled.nsls2.bnl.gov")['tst/sandbox/iss/processed']
 
-    # Validate pathlib and extract filename
+    # Validate pathlib and extract filename, proposal dir etc.
     filename = Path(filename).name
 
     search = client.search(Contains("interp_filename", filename))
     # Handle exception search result container is empty
     if len(search.items()) == 0:
         raise ValueError(f"No records containing filename {filename} found in tiled.")
-    tile = search.values().first()
+    tile = search.values().last()
     header = tile.metadata
     df = tile.read()
     if 'energy' in [i.lower() for i in df.columns]:
