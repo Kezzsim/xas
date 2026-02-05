@@ -5,6 +5,7 @@ from tiled.client.node import Node
 from tiled.queries import Key, Contains
 from tiled.client.cache import Cache
 
+from pathlib import Path
 import pandas as pd
 
 from collections import UserDict, namedtuple
@@ -274,14 +275,16 @@ def load_interpolated_df_from_tiled(filename):
     ''' Load interp tiled and return'''
     client = from_uri("https://tiled.nsls2.bnl.gov")['tst/sandbox/iss/processed']
 
+    # Validate pathlib and extract filename
+    filename = Path(filename).name
+
     search = client.search(Contains("interp_filename", filename))
     # Handle exception search result container is empty
     if len(search.items()) == 0:
         raise ValueError(f"No records containing filename {filename} found in tiled.")
-    else:
-        header = search.values().first()
-    keys = header[header.rfind('#'):][1:-1].split()
-    df = pd.read_csv(filename, delim_whitespace=True, comment='#', names=keys, index_col=False)
-    if 'energy' in [i.lower() for i in df.columns]: # I am not sorry /// Kari
+    tile = search.values().first()
+    header = tile.metadata
+    df = tile.read()
+    if 'energy' in [i.lower() for i in df.columns]:
         df = df.sort_values('energy'.lower())
     return df, header
