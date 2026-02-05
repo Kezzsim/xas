@@ -14,7 +14,7 @@ import itertools
 from xas.xdash_math import LarchCalculator, calc_mus
 import uuid
 
-client = from_uri("https://tiled.nsls2.bnl.gov")['tst/sandbox/iss/processed']
+client = from_uri("https://tiled.nsls2.bnl.gov")['iss/sandbox']
 
 _LABEL_DICT = {'mu': 'mu',
                'normalized': 'mu norm',

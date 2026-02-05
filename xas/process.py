@@ -60,7 +60,7 @@ import gc
 
 from tiled.client import from_uri
 
-client = from_uri("https://tiled.nsls2.bnl.gov")["tst/sandbox/iss/processed"]
+client = from_uri("https://tiled.nsls2.bnl.gov")['iss/sandbox']
 
 
 def process_interpolate_bin(
