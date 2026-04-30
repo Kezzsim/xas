@@ -3920,3 +3920,534 @@ for element in qas_foils:
             _qas_foil_data.append({'element': element,
                           'edge':edge,
                           'energy':energy})
+
+
+
+
+old = pd.read_csv('old_pressure_data1', parse_dates=[0], sep='\t', skiprows=16)
+new = pd.read_csv('new_pressure_data3', parse_dates=[0], sep='\t', skiprows=16)
+
+plt.figure()
+
+time_old = old.iloc[:, 0].astype('int64') // 1E9
+time_old = time_old - time_old[0]
+
+time_new = new.iloc[:, 0].astype('int64') // 1E9
+time_new = time_new - time_new[0]
+
+plt.plot(time_old, old.iloc[:, 1])
+plt.plot(time_new, new.iloc[:, 1])
+
+
+new = pd.read_csv('new_pressure_data_5', parse_dates=[0], sep='\t', skiprows=16)
+time_new = new.iloc[:, 0].astype('int64') // 1E9
+time_new = time_new - time_new[0]
+
+plt.figure()
+plt.plot(time_new[1:], new.iloc[:, 1][1:])
+plt.plot(time_new[1:], 3E-3/np.sqrt(time_new[1:]))
+
+
+
+columns = ['timestamp', 'ps_level', 'ps_pressure', 'bath_level', 'bath_pressure',
+           'accu_level', 'accu_pressure', 'p1', 'p2', 't1', 't2', 't3', 't4', 'rate', 'temp_flow_meter']
+
+old = pd.read_csv('Cryo_data', parse_dates=[0], sep='\t', comment='#', names=columns)
+time_old = old['timestamp'].astype('int64') // 1E9
+
+timestamp = time_old - time_old[0]
+
+
+plt.figure()
+plt.plot(timestamp, old['ps_level'], label='PS Level')
+plt.plot(timestamp, old['bath_level'], label='Bath Level')
+plt.plot(timestamp, old['accu_level'], label='Accumulator Level')
+plt.xlabel("Time (sec)")
+plt.ylabel("Level (%)")
+plt.xlim(280000, 340000)
+plt.legend()
+
+plt.figure()
+plt.plot(timestamp, old['ps_pressure'], label='PS Pressure')
+plt.plot(timestamp, old['bath_pressure'], label='Bath Pressure')
+plt.plot(timestamp, old['accu_pressure'], label='Accumulator Pressure')
+plt.xlabel("Time (sec)")
+plt.ylabel("Pressure (kPa)")
+plt.xlim(280000, 340000)
+plt.legend()
+
+
+
+plt.figure()
+plt.plot(timestamp, old['p1'], label='Supply LN2 Pressure')
+plt.plot(timestamp, old['p2'], label='Return LN2 Pressure')
+plt.xlabel("Time (sec)")
+plt.ylabel("Pressure (kPa)")
+plt.xlim(280000, 340000)
+plt.legend()
+
+
+plt.figure()
+plt.plot(timestamp, old['t1'], label='T1')
+plt.plot(timestamp, old['t2'], label='T2')
+plt.plot(timestamp, old['t3'], label='T3')
+plt.plot(timestamp, old['t4'], label='T4')
+plt.xlabel("Time (sec)")
+plt.ylabel("Temperature (K)")
+plt.xlim(280000, 340000)
+plt.ylim(75, 85)17100
+plt.legend()
+
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib.widgets import Cursor
+
+# Create some sample data
+x = np.linspace(0, 10, 100)
+y = np.sin(x)
+
+# Create a figure and an axes object
+fig, ax = plt.subplots()
+
+# Plot the data
+ax.plot(x, y)
+
+# Create the Cursor widget
+# The 'ax' argument specifies the axes to attach the cursor to.
+# 'horizOn' and 'vertOn' control whether horizontal and vertical lines are shown.
+# 'color' and 'linewidth' customize the appearance of the lines.
+cursor = Cursor(ax, horizOn=True, vertOn=True, color='red', linewidth=1)
+
+# Display the plot
+plt.show()
+
+
+von_hamos_geometry.crystal = "Ge"
+von_hamos_geometry.e2bragg(8900) = 80.02740605090814
+
+von_hamos_geometry.compute_geometry_for_energy(8900)
+(507.67054619950966, 30.450391642263536, 173.17709884065675, 9.97259394909186)
+cr_x, det_x, det_y, theta
+
+von_hamos_geometry.compute_arc_motion(bragg=80.02740605090814)
+26.349880385574153
+
+von_hamos_det_arm._forward({'det_pitch':80.02740605090814, 'det_x':30.450391642263536, 'det_y':173.17709884065675})
+{'motor_det_x': 203.77061970977343,
+ 'motor_det_th1': 36.16126864517311,
+ 'motor_det_th2': -46.133862594264976}
+
+
+bender_positions = [1.42,
+ 1.83,
+ 2.24,
+ 2.65,
+ 3.06,
+ 3.47,
+ 3.88,
+ 4.29,
+ 4.7,
+ 5.11,
+ 5.52,
+ 5.93,
+ 6.34,
+ 6.75,
+ 7.16,
+ 7.57,
+ 7.98,
+ 8.39,
+ 8.8,
+ 9.21,
+ 9.63,
+ 10.04,
+ 10.45,
+ 10.86,
+ 11.27,
+ 11.68,
+ 12.09,
+ 12.5,
+ 12.91,
+ 13.32,
+ 13.73,
+ 14.14,
+ 14.55,
+ 14.96,
+ 15.37,
+ 15.78,
+ 16.19,
+ 16.6,
+ 17.01,
+ 17.42]
+
+plans = bender_scan_plan_bundle(element='Cu', edge='K', bender_positions=bender_positions)
+plan_processor.add_plans(plans)
+
+#4900,  5100,  5500,  6000,  7000,  8000,  9000, 10000, 11000, 12000, 13000, 15000, 17500, 20000, 26000]
+
+
+###################################
+########## hhm_y_precise tabulation 2025-10-30
+#########################################
+{energy:[4950, 5100, 5500, 6000, 7000, 8000, 9000, 10000, 11000, 12000, 15000, 17500, 20000, 26000, 31000],
+ uid:['9d8973fe-cb65-4b26-b15b-357be7586668',
+      '0cc86d17-031a-4b4e-b47c-ba78f4424881',
+      'cd5f43b2-09b3-4583-a6ec-54ef696791b4',
+      '9196b604-b76f-4813-8f32-896503ea274f',
+      '265c9bd1-4f44-4b31-8610-b8cb3af28c49',
+      'b44b7661-231f-4062-af44-729fcb9020ca',
+      '58bad7c0-313a-4035-bd6f-38f76b6fdec0',
+       '96aa3c29-82f5-4944-9e18-4ccc662d22a6',
+       '472da164-24ce-49f8-a938-468a5108e756',
+        '765485e5-3fe6-40ff-b32d-ee1c1abade71',
+'711e5f0a-bb59-40a8-9ce4-89d0f0cd60a4',
+'711e5f0a-bb59-40a8-9ce4-89d0f0cd60a4',
+'fef3865c-4cd0-4360-976c-d079dbbd6488'
+'37973463-a254-4c8f-9ad0-4efa7d3acb52',
+'3b79c065-9bf0-444d-a0d0-9f9bbbed22a2'
+'b0d6fec1-80d2-47a6-af0b-760ad7d9e973'
+
+      ],
+ value:[8.657, 8.606, 8.457, 8.36, 8.243, 8.143, 8.097, 8.044, 8.046, 7.995, 7.937, 7.930, 7.922, 7.940, 7.920]}
+
+uids = [
+'b0d6fec1-80d2-47a6-af0b-760ad7d9e973',
+'37973463-a254-4c8f-9ad0-4efa7d3acb52',
+'28234a63-6c58-4b0f-bdb6-a6ca6f2cae14',
+'8e307546-5e32-4dfe-9972-148235f7b06a',
+'711e5f0a-bb59-40a8-9ce4-89d0f0cd60a4',
+'765485e5-3fe6-40ff-b32d-ee1c1abade71',
+'472da164-24ce-49f8-a938-468a5108e756',
+'96aa3c29-82f5-4944-9e18-4ccc662d22a6',
+'58bad7c0-313a-4035-bd6f-38f76b6fdec0',
+'b44b7661-231f-4062-af44-729fcb9020ca',
+'265c9bd1-4f44-4b31-8610-b8cb3af28c49',
+'9196b604-b76f-4813-8f32-896503ea274f',
+'cd5f43b2-09b3-4583-a6ec-54ef696791b4',
+'0cc86d17-031a-4b4e-b47c-ba78f4424881',
+'9d8973fe-cb65-4b26-b15b-357be7586668',]
+
+
+'711e5f0a-bb59-40a8-9ce4-89d0f0cd60a4'
+
+
+uids = [
+'8e307546-5e32-4dfe-9972-148235f7b06a' #15000
+'28234a63-6c58-4b0f-bdb6-a6ca6f2cae14' #17500
+'fef3865c-4cd0-4360-976c-d079dbbd6488' #20000
+'37973463-a254-4c8f-9ad0-4efa7d3acb52' #26000
+'b0d6fec1-80d2-47a6-af0b-760ad7d9e973' #31000
+]
+
+uids = np.arange(-1, -200, -1)
+for uid in uids:
+    hdr = db[uid]
+    dictionary = hdr.start
+    try:
+        if dictionary['motors'][0] == 'hhm_y_precise':
+            print(dictionary['uid'])
+    except Exception as e:
+        print(e)
+uids = [
+'b0d6fec1-80d2-47a6-af0b-760ad7d9e973',
+'37973463-a254-4c8f-9ad0-4efa7d3acb52',
+'fef3865c-4cd0-4360-976c-d079dbbd6488',
+'28234a63-6c58-4b0f-bdb6-a6ca6f2cae14',
+'1761d3a0-c004-44ca-9ce9-f1140c26dd1a'
+'8e307546-5e32-4dfe-9972-148235f7b06a',
+'711e5f0a-bb59-40a8-9ce4-89d0f0cd60a4',
+'765485e5-3fe6-40ff-b32d-ee1c1abade71',
+'472da164-24ce-49f8-a938-468a5108e756',
+'96aa3c29-82f5-4944-9e18-4ccc662d22a6',
+'58bad7c0-313a-4035-bd6f-38f76b6fdec0',
+'b44b7661-231f-4062-af44-729fcb9020ca',
+'265c9bd1-4f44-4b31-8610-b8cb3af28c49',
+'9196b604-b76f-4813-8f32-896503ea274f',
+'cd5f43b2-09b3-4583-a6ec-54ef696791b4',
+'0cc86d17-031a-4b4e-b47c-ba78f4424881',
+'9d8973fe-cb65-4b26-b15b-357be7586668'
+]
+
+
+uids = [
+# '811390d3-da27-47e6-9d27-a56bc0e51a32',
+# '2c5e8b96-d637-4fb8-9c71-aea94ac7b229',
+'711e5f0a-bb59-40a8-9ce4-89d0f0cd60a4',
+'5e9a5e41-9686-44da-a1f4-51f212ba3805']
+
+
+plt.figure()
+s = []
+for i, uid in enumerate(uids):
+    print(uid)
+    hdr = db[uid]
+    t = hdr.table()
+    plt.plot(t['hhm_y_precise'], t['bpm_fm_stats1_total'], label=str(i))
+    arg = np.argmax(t['bpm_fm_stats1_total'])
+    s.append(t['hhm_y_precise'][arg])
+
+plt.legend()
+
+
+def create_zip(self):
+    _, _current_user = self.user_manager.current_user()
+    proposal = (_current_user['runs'][-1]['proposal'])
+
+    year = self.RE.md['year']
+    cycle = self.RE.md['cycle']
+    proposal = self.RE.md['proposal']
+    PI = self.RE.md['PI']
+    email_address = self.lineEdit_email.text()
+    # working_directory = f'/nsls2/xf08id/users/{year}/{cycle}/{proposal}'
+    working_directory = f'{ROOT_PATH}/{USER_PATH}/{year}/{cycle}/{proposal}'
+    zip_file = f'{working_directory}/{proposal}.zip'
+    id = str(uuid.uuid4())[0:5]
+    zip_id_file = f'{proposal}-{id}.zip'
+
+    if os.path.exists(zip_file):
+        os.remove(zip_file)
+
+    # os.system(f'zip {zip_file} {working_directory}/*.* ')
+
+    print('Creating a zip file')
+    os.system(f"cd '{working_directory}'; zip '{zip_id_file}' *.dat")
+
+    message = create_html_message(
+        'staff08id@gmail.com',
+        email_address,
+        f'ISS beamline data for Proposal {proposal}\n',
+        f' <p> Dear {PI},</p> <p>You can download the results of your experiment from JupyterHub by following the steps below: </p>'
+        f'<p> 1. Go to https://jupyter.nsls2.bnl.gov and log in using your BNL credentials. </p>'
+        f'<p> 2. Click on "Start My Server" to launch a new server or relaunch an already active server. </p>'
+        f'<p> 3. In the "Server Options" window, select "Scientific Python" as the job profile, then click "Start".</p>'
+        f'<p> 4. In the File menu, select "Open from Path..." </p>'
+        f'<p> 5. Copy and paste the following path (without quotation marks): "{working_directory}" </p>'
+        f'<p> 6. Right-click on the zip file named {zip_id_file} and download it to your PC. </p> '
+        f'<p> Sincerely, </p> <p> ISS Staff </p>'
+    )
+
+    draft = upload_draft(self.parent.gmail_service, message)
+    sent = send_draft(self.parent.gmail_service, draft)
+    print('Email sent for zip files')
+
+
+uid = 'db4997cb-9e39-462c-9c58-454999ace698'
+uid1 = 'c6501f5f-61d1-43cd-b62e-fa5421c83789'
+
+hdr = db['db4997cb-9e39-462c-9c58-454999ace698']
+hdr1 = db['c6501f5f-61d1-43cd-b62e-fa5421c83789']
+
+
+from xas.file_io import (load_dataset_from_files, create_file_header, validate_file_exists, validate_path_exists,
+                      save_interpolated_df_as_file, save_binned_df_as_file, find_e0, save_stepscan_as_file,
+                      stepscan_remove_offsets, stepscan_normalize_xs, stepscan_normalize_xia,combine_xspress3_channels, combine_pil100k_channels,
+                      combine_xia_channels,
+                      filter_df_by_valid_keys, save_primary_df_as_file, save_extended_data_as_file, dump_tiff_images)
+from xas.db_io import load_apb_dataset_from_db, translate_apb_dataset, load_apb_trig_dataset_from_db, load_xs3_dataset_from_db, load_pil100k_dataset_from_db, load_apb_dataset_only_from_db, translate_apb_only_dataset, load_xia_dataset_from_db
+from xas.interpolate import interpolate, interpolate_with_interp
+
+apb_df, energy_df, energy_offset = load_apb_dataset_from_db(db, uid)
+raw_dict = translate_apb_dataset(apb_df, energy_df, energy_offset)
+
+t = hdr.table(stream_name='pb9_enc1', fill=True)
+t1 = hdr.table(stream_name='pb9_enc1', fill=True)
+
+plt.figure()
+plt.plot(t['pb9_enc1'][1]['ts_s']+t['pb9_enc1'][1]['ts_ns'], t['pb9_enc1'][1]['encoder'])
+
+
+plt.figure()
+plt.plot(raw_dict['energy']['timestamp']-raw_dict['energy']['timestamp'][0], raw_dict['energy']['encoder'])
+plt.plot(raw_dict1['energy']['timestamp']-raw_dict1['energy']['timestamp'][0], raw_dict1['energy']['encoder'])
+
+
+apb_df, energy_df, energy_offset = load_apb_dataset_from_db(db, uid)
+raw_dict1 = translate_apb_dataset(apb_df, energy_df, energy_offset)
+
+
+uid2 = 'b28a5efa-daa6-4b1a-ac6b-a47c24bef538'
+uid3 = 'c5028810-ecf0-4c84-9112-6de064c60c49'
+
+apb_df, energy_df, energy_offset = load_apb_dataset_from_db(db, uid2)
+raw_dict2 = translate_apb_dataset(apb_df, energy_df, energy_offset)
+apb_df, energy_df, energy_offset = load_apb_dataset_from_db(db, uid3)
+raw_dict3 = translate_apb_dataset(apb_df, energy_df, energy_offset)
+
+
+plt.figure()
+plt.plot(raw_dict2['energy']['timestamp']-raw_dict2['energy']['timestamp'][0], raw_dict2['energy']['encoder'])
+plt.plot(raw_dict3['energy']['timestamp']-raw_dict3['energy']['timestamp'][0], raw_dict3['energy']['encoder'])
+
+
+def plot_beamdamage_scans(uid=-1):
+    hdr = db[uid]
+    t = hdr.t
+
+
+
+def plot_scan(uid=-1):
+    hdr = db[uid]
+    t = hdr.table()
+    plt.plot(t['hhm_energy'], np.log(t['bpm_fm_stats1_total']))
+
+
+
+### March 30, 2026
+
+#### Inclinometer data from -27 to 69 degree
+d = {'motor_det_th1': {'0': -27,
+  '1': -24,
+  '2': -21,
+  '3': -18,
+  '4': -15,
+  '5': -12,
+  '6': -9,
+  '7': -6,
+  '8': -3,
+  '9': 0,
+  '10': 3,
+  '11': 6,
+  '12': 9,
+  '13': 12,
+  '14': 15,
+  '15': 18,
+  '16': 21,
+  '17': 24,
+  '18': 27,
+  '19': 30,
+  '20': 33,
+  '21': 36,
+  '22': 39,
+  '23': 42,
+  '24': 45,
+  '25': 48,
+  '26': 51,
+  '27': 54,
+  '28': 57,
+  '29': 60,
+  '30': 63,
+  '31': 66,
+  '32': 69},
+ 'motor_det_inc1': {'0': 14646,
+  '1': 14381,
+  '2': 14113,
+  '3': 13848,
+  '4': 13578,
+  '5': 13309,
+  '6': 13040,
+  '7': 12770,
+  '8': 12507,
+  '9': 12237,
+  '10': 11968,
+  '11': 11700,
+  '12': 11436,
+  '13': 11166,
+  '14': 10902,
+  '15': 10632,
+  '16': 10362,
+  '17': 10094,
+  '18': 9829,
+  '19': 9560,
+  '20': 9291,
+  '21': 9026,
+  '22': 8757,
+  '23': 8493,
+  '24': 8223,
+  '25': 7960,
+  '26': 7691,
+  '27': 7421,
+  '28': 7157,
+  '29': 6888,
+  '30': 6618,
+  '31': 6355,
+  '32': 6085}}
+
+#### Inclinometer data from 69 to -27 degree
+
+d = {'motor_det_th1': {'0': -27,
+  '1': -24,
+  '2': -21,
+  '3': -18,
+  '4': -15,
+  '5': -12,
+  '6': -9,
+  '7': -6,
+  '8': -3,
+  '9': 0,
+  '10': 3,
+  '11': 6,
+  '12': 9,
+  '13': 12,
+  '14': 15,
+  '15': 18,
+  '16': 21,
+  '17': 24,
+  '18': 27,
+  '19': 30,
+  '20': 33,
+  '21': 36,
+  '22': 39,
+  '23': 42,
+  '24': 45,
+  '25': 48,
+  '26': 51,
+  '27': 54,
+  '28': 57,
+  '29': 60,
+  '30': 63,
+  '31': 66,
+  '32': 69},
+ 'motor_det_inc1': {'0': 14621,
+  '1': 14351,
+  '2': 14081,
+  '3': 13818,
+  '4': 13548,
+  '5': 13294,
+  '6': 13035,
+  '7': 12765,
+  '8': 12501,
+  '9': 12232,
+  '10': 11962,
+  '11': 11699,
+  '12': 11430,
+  '13': 11160,
+  '14': 10896,
+  '15': 10626,
+  '16': 10363,
+  '17': 10094,
+  '18': 9824,
+  '19': 9555,
+  '20': 9291,
+  '21': 9021,
+  '22': 8757,
+  '23': 8488,
+  '24': 8223,
+  '25': 7955,
+  '26': 7685,
+  '27': 7422,
+  '28': 7152,
+  '29': 6882,
+  '30': 6619,
+  '31': 6350,
+  '32': 6085,}}
+
+
+plt.plot(t['apb_stream'][1]['timestamp'],t['apb_stream'][1]['i0'])
+
+junk_uids = []
+for uid in uids:
+    try:
+        apb_df, energy_df, energy_offset = load_apb_dataset_from_db(db, uid)
+        print(len(apb_df['timestamp']))
+    except Exception as ex:
+        junk_uids.append(uid)
+        print(ex)
+
+
+
+data = np.arange(0, 720, 1)
+sin = 500 + np.sin(data*np.pi/180)
+noise = np.random.normal(0, 0.2, sin.shape)
+
+noisy_signal = sin+noise
+plt.figure()
+plt.plot(data, noisy_signal)

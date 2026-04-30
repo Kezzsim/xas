@@ -102,6 +102,9 @@ def energy2encoder(energy, pulses_per_deg, offset = 0):
 def energy2angle(energy,  offset = 0):
     return np.degrees(np.arcsin(-12398.42 / (2 * 3.1356 * energy))) - float(offset)
 
+def energy2angle_Si311(energy, offset=0):
+    return np.degrees(np.arcsin(-12398.42 / (2 * 1.63758053 * energy))) - float(offset)
+
 # shamelessly taken from xraydb:
 lattice_constants = {'Si': 5.4309, 'Ge': 5.6578, 'C': 3.567}
 def bragg2e(ba_deg, crystal, hkl):

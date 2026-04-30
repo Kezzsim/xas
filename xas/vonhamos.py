@@ -789,15 +789,20 @@ class ProcessingThread(QThread):
 class ProcessingTask:
     def __init__(self, files: list = None,
                  plot_calibration: bool = False,
+                 merge_and_plot_total: bool = False,
                  perform_calibration: bool = False,
                  process_scan_file: bool = False,
-                 calibration_with_rois: bool = False, sliced_image: dict = None, *args, **kwargs) -> None:
+                 calibration_with_rois: bool = False,
+                 create_xes_data: bool = False,
+                 data: dict = None, *args, **kwargs) -> None:
         self.files = files
         self.plot_calibration = plot_calibration
+        self.merge_and_plot_total = merge_and_plot_total
         self.perform_calibration = perform_calibration
         self.process_scan_file = process_scan_file
         self.calibration_with_rois = calibration_with_rois
-        self.sliced_image = sliced_image
+        self.create_xes_data = create_xes_data
+        self.data = data
 
 
 class ProcessingWorker(QObject):
@@ -836,12 +841,74 @@ class ProcessingWorker(QObject):
                 energies, i0, images = load_h5(path)
                 image_total, energies, x_pix, intensity_total, intensity_total_fit, x_pix_centers, fwhms, p_xy, p_xe = run_calibration(
                     images, energies, output_diagnostics=False)
-                results = give_plot_dictionary(energies, i0, images, 'calibration', path, image_total, x_pix,
+                results = {}
+                results['plot_type'] = 'auto_calibration'
+                results['data'] = give_plot_dictionary(energies, i0, images, 'calibration', path, image_total, x_pix,
                                                intensity_total, intensity_total_fit, x_pix_centers, fwhms, p_xy, p_xe)
+
                 self.result_ready.emit(results)
+
+            elif task.calibration_with_rois:
+                print(f"Performing calibration")
+                results = {}
+                results['image_total'] = task.data['image']
+                results['plot_type'] = 'roi_calibration'
+                results['data'] = {}
+                for roi_index, mask in task.data['rois'].items():
+                    masked_image_array = get_masked_image_array(images=images, mask=mask)
+                    image_total, energies, x_pix, intensity_total, intensity_total_fit, x_pix_centers, fwhms, p_xy, p_xe = run_calibration(
+                        masked_image_array, energies, output_diagnostics=False)
+                    results['data'][roi_index] = give_plot_dictionary(energies, i0, masked_image_array, 'roi_calibration', path, image_total, x_pix,
+                                         intensity_total, intensity_total_fit, x_pix_centers, fwhms, p_xy, p_xe)
+                self.result_ready.emit(results)
+
+
+            elif task.merge_and_plot_total:
+                print(f"Plotting Integrated Images")
+                image_total = []
+                results = {}
+                results['plot_type'] = 'total'
+                results['data'] = {}
+                for path in task.files:
+                    energies, i0, images = load_h5(path)
+                    image_total.append(images.sum(axis=0))
+                image_total = np.array(image_total)
+                results['image_total'] = image_total.sum(axis=0)
+                self.result_ready.emit(results)
+
+            elif task.create_xes_data:
+                print(f"Creating XES data")
+                for roi_index, mask in task.data['rois'].items():
+                    for file in task.files:
+                        energies, i0, images = load_h5(file)
+                        masked_image_array = get_masked_image_array(images=images, mask=mask)
+                        calibration = task.data['calibration'][roi_index]
+                        filename = os.path.basename(file)
+                        filepath = os.path.dirname(file)
+                        for energy, image in zip(energies, masked_image_array):
+                            final_filename = f"{filename}_{energy}_Crystal_{roi_index}.dat"
+                            xes = np.sum(image, axis=0)
+                            np.savetxt(filepath + "/" + final_filename, np.column_stack((calibration['energy'], xes)), header="Energy xes")
+                print(f"XES data created")
+
+
+
 
         self.finished.emit()
 
+
+def get_total_image(images = None):
+    return images.sum(axis=0)
+
+def get_array_average(arrays=None, axis=0):
+    return
+
+
+def get_masked_image_array(images = None, mask = None):
+    masked_image_array = []
+    for img in images:
+        masked_image_array.append(np.where(mask, img, 0))
+    return np.array(masked_image_array)
 
 
 def create_mean_dictionary(mean_energies, mean_images, plot_type):
@@ -850,6 +917,27 @@ def create_mean_dictionary(mean_energies, mean_images, plot_type):
     dictionary['mean_images'] = mean_images.sum(axis=0)
     dictionary['mean_energies'] = mean_energies
     return dictionary
+
+
+def average_hdf5_rixs_files(file_list=None, dataset_path=None):
+    mean_dictionary = {}
+    mean_dictionary['energy'] = []
+    mean_dictionary['i0'] = []
+    mean_dictionary['images'] = []
+    for i, filepath in enumerate(file_list):
+        energies, i0, images = load_h5(filepath)
+        mean_dictionary['energy'].append(energies)
+        mean_dictionary['i0'].append(i0)
+        mean_dictionary['images'].append(images)
+
+    mean_dictionary['energy'] = np.array(mean_dictionary['energy']).sum(axis=0)/len(file_list)
+    mean_dictionary['i0'] = np.array(mean_dictionary['i0']).sum(axis=0)/len(file_list)
+    mean_dictionary['images'] = np.array(mean_dictionary['images']).sum(axis=0)/len(file_list)
+
+    return mean_dictionary
+
+
+
 
 
 def give_plot_dictionary(energies, i0, images, plot_type, path, image_total, x_pix, intensity_total, intensity_total_fit, x_pix_centers, fwhms, p_xy, p_xe):
@@ -886,7 +974,6 @@ def give_plot_dictionary(energies, i0, images, plot_type, path, image_total, x_p
     dictionary['processed']['intensity_total']['x'] = np.polyval(p_xe, x_pix)
     dictionary['processed']['intensity_total']['y'] = intensity_total
     dictionary['processed']['intensity_total']['fit'] = intensity_total_fit
-
 
 
 

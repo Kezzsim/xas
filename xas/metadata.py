@@ -116,16 +116,19 @@ for i in range(1, 17):
     _ghs_mfc_dict[f'ghs_mfc_{i}_sp'] = {'kind': 'epics_pv', 'pv_str': 'XF:08IDB-UT{Gas:1-MFC:' + f'{i:02d}' + '}F:Target-SP','human_readable_key': f'SampleGasHandlingSystem.MFC{i}.setpoint.sccm', 'notation': "3.1f"}
     _ghs_mfc_dict[f'ghs_mfc_{i}_rb'] = {'kind': 'epics_pv', 'pv_str': 'XF:08IDB-UT{Gas:1-MFC:' + f'{i:02d}' + '}F-I',        'human_readable_key': f'SampleGasHandlingSystem.MFC{i}.readback.sccm', 'notation': "3.1f"}
 
-_rga_dict = OrderedDict()
-for i in range(1, 11):
-    _rga_dict[f'rga_ch{i}_mass'] = {'kind': 'epics_pv', 'pv_str': 'XF:08IDB-VA{RGA:1}Mass:MID' + f'{i}',
-                                        'human_readable_key': f'SampleGasHandlingSystem.RGA.ch{i}.mass.amu'}
-    _rga_dict[f'rga_ch{i}_rb'] = {'kind': 'epics_pv',   'pv_str': 'XF:08IDB-SE{RGA:1}P:MID' + f'{i}' + '-I',
-                                        'human_readable_key': f'SampleGasHandlingSystem.RGA.ch{i}.pressure.torr', 'notation': ".3E"}
+# _rga_dict = OrderedDict()
+# for i in range(1, 11):
+#     _rga_dict[f'rga_ch{i}_mass'] = {'kind': 'epics_pv', 'pv_str': 'XF:08IDB-VA{RGA:1}Mass:MID' + f'{i}',
+#                                         'human_readable_key': f'SampleGasHandlingSystem.RGA.ch{i}.mass.amu'}
+#     _rga_dict[f'rga_ch{i}_rb'] = {'kind': 'epics_pv',   'pv_str': 'XF:08IDB-SE{RGA:1}P:MID' + f'{i}' + '-I',
+#                                         'human_readable_key': f'SampleGasHandlingSystem.RGA.ch{i}.pressure.torr', 'notation': ".3E"}
     
 # @TerribleHack to allow to work on RGA
 # metadata_dict = {**metadata_dict, **_ghs_selected_gas_dict, **_ghs_mfc_dict, **_rga_dict}
-metadata_dict = {**metadata_dict, **_ghs_selected_gas_dict, **_ghs_mfc_dict, **_rga_dict}
+# metadata_dict = {**metadata_dict, **_ghs_selected_gas_dict, **_ghs_mfc_dict, **_rga_dict}
+
+metadata_dict = {**metadata_dict, **_ghs_selected_gas_dict, **_ghs_mfc_dict}
+
 
 ghs_selected_gas_key_match = {
     'ghs_selected_gas_a': {0: 'None',   1: 'Phosphine',     2: 'Arsine'},
