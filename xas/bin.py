@@ -100,13 +100,21 @@ def _compute_window_width(sample_points):
 
 
 def bin(interpolated_dataset, e0, edge_start=-30, edge_end=50, preedge_spacing=5,
-                        xanes_spacing= -1, exafs_k_spacing = 0.04, skip_binning=False ):
+                        xanes_spacing= -1, exafs_k_spacing = 0.04, skip_binning=False, radiation_damage_scan=False):
     if skip_binning:
-        binned_df = interpolated_dataset
-        col = binned_df.pop("energy")
-        n = len(binned_df.columns)
-        binned_df.insert(n, col.name, col)
-        binned_df = binned_df.sort_values('energy')
+        if radiation_damage_scan:
+            print("Processing radiation damage scan....")
+            binned_df = interpolated_dataset.sort_values('timestamp')
+            binned_df.pop("energy")
+            binned_df['timestamp'] = binned_df['timestamp'] - binned_df['timestamp'].min()
+            binned_df.rename(columns={'timestamp': 'energy'}, inplace=True)
+            return binned_df
+        else:
+            binned_df = interpolated_dataset
+            col = binned_df.pop("energy")
+            n = len(binned_df.columns)
+            binned_df.insert(n, col.name, col)
+            binned_df = binned_df.sort_values('energy')
     else:
         print(f'({ttime.ctime()}) Binning the data: BEGIN')
         if  xanes_spacing==-1:

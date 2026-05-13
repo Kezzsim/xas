@@ -1,5 +1,6 @@
 
-from xas.bin import bin, bin_epics_fly_scan
+from xas.bin import bin_epics_fly_scan
+from xas.bin import bin as rebin
 from xas.file_io import (load_dataset_from_files, create_file_header, validate_file_exists, validate_path_exists,
                       save_interpolated_df_as_file, save_binned_df_as_file, find_e0, save_stepscan_as_file,
                       stepscan_remove_offsets, stepscan_normalize_xs, stepscan_normalize_xia,combine_xspress3_channels, combine_pil100k_channels,
@@ -202,7 +203,7 @@ def get_processed_df_from_uid(uid, db, logger=None, draw_func_interp=None, draw_
             if e0 > 0:
                 # rebin_kwargs = filter_rebin_kwargs(processing_kwargs)
                 rebin_kwargs = {}
-                processed_df = bin(interpolated_df, e0, **rebin_kwargs)
+                processed_df = rebin(interpolated_df, e0, **rebin_kwargs, skip_binning=hdr.start['radiation_damage_scan'], radiation_damage_scan=hdr.start['radiation_damage_scan'])
                 (path, extension) = os.path.splitext(path_to_file)
                 path_to_file = path + '.dat'
                 logger.info(f'({ttime.ctime()}) Binning successful for {path_to_file}')
