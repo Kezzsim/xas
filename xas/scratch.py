@@ -4451,3 +4451,131 @@ noise = np.random.normal(0, 0.2, sin.shape)
 noisy_signal = sin+noise
 plt.figure()
 plt.plot(data, noisy_signal)
+
+# Mingzhao Liu 'PROPOSAL': '309093' 'year': '2021''cycle': '3'
+from tiled.client import from_uri
+from tiled.queries import Key
+
+catalog = from_uri("https://tiled.nsls2.bnl.gov")
+c = catalog['iss']['raw']
+
+results = c.search(Key("start.PROPOSAL") == '309093').search(Key("start.experiment") == 'fly_energy_scan_apb')
+
+
+plt.figure()
+scan_ids = [167590, 167600, 167608, 167617, 167625]
+scaling = [1, 1, 1, 1, 1]
+for sids, sca in zip(scan_ids, scaling):
+    hdr = db[sids]
+    t = hdr.table()
+    plt.plot(t['hhm_energy'], t['apb_ave_ch1']*sca)
+plt.yscale(u'log')
+
+scan_ids = [167590, 167600, 167608, 167617, 167625]
+uids = []
+for scan_id in scan_ids:
+    hdr = db[scan_ids[id]]
+    t = hdr.start
+    t.uid
+    t.scan_id
+    uids.append(t.uid)
+
+voltages = list(np.arange(0, 1651, 1))
+RE(bp.list_scan([apb_ave], wps1.hv302, voltages))
+def voltage_scan(voltages=None):
+    for volt in voltages:
+        yield from bps.abs_set(wps1.hv302, volt)
+        yield from sleep(5)
+        yield from bp.count([apb_ave])
+
+
+
+from ophyd.status import DeviceStatus
+import threading
+class WPS_Scan(Device):
+    setpoint = Cpt(EpicsSignal, 'HV:u302}V-Set')
+    readback = Cpt(EpicsSignalRO, 'HV:u302}V-Sense', name='wps_i0_plate')
+    hv302 = Cpt(DeviceWithNegativeReadBack, 'HV:u302}')
+
+    def __init__(self, prefix, WPS_scan_id=None, **kwargs):
+        super().__init__(prefix, **kwargs)
+        self.WPS_scan_id = WPS_scan_id
+
+        if self.WPS_scan_id is None:
+            self.WPS_scan_id = 'WPS_scan'
+
+    def set(self, value):
+        status = DeviceStatus(self)
+
+        def _move():
+            self.setpoint.put(value, wait=True)
+            time.sleep(4)
+            status.set_finished()
+
+        threading.Thread(target=_move, daemon=True).start()
+        return status
+
+    def read(self):
+        return {self.WPS_scan_id: {'value':self.readback.get(), 'timestamp': time.time()}}
+
+    def describe(self):
+        return {self.WPS_scan_id: {'source': 'PV-Sense', 'dtype': 'number', 'shape': []}}
+
+    def stop(self, *, success=False):
+        self.setpoint.stop()
+
+    def is_moving(self):
+        return False
+
+    def read_configuration(self):
+        return {}
+
+    def describe_configuration(self):
+        return {}
+
+
+wps_i0 = WPS_Scan('XF:08IDB-OP{WPS:01-', name='wps_i0', WPS_scan_id='WPS_scan_i0')
+
+
+def voltage_plataue():
+    He =  np.array([90, 85, 80, 75]) * 0.05
+    N2 = np.array([10, 15, 20, 25]) * 0.05
+    absorptions = [4, 6.4, 8.5, 10]
+    voltages = np.arange(40, 1651, 20)
+    uids = []
+    for n2, he, absorp in zip(N2, He, absorptions):
+        yield from bps.abs_set(wps_i0.hv302, 40, wait=True)
+        print(f"Setting up the voltage to safe value...............")
+        print(f"Setting up the flow for {n2 = } and {he = } with absorption {absorp = }")
+        yield from bps.abs_set(gas_he.flow, he, wait=True)
+        yield from bps.abs_set(gas_n2.flow, n2, wait=True)
+        yield from sleep(180)
+        print(f"Gases change is now complete.........................")
+        dictionary = {'gases': {'N2': n2, 'He': he}, 'absorption': absorp}
+        uid = yield from bp.list_scan([apb_ave], wps_i0, voltages.tolist(), md=dictionary)
+        uids.append(uid)
+    return uids
+
+
+uids = []
+plt.figure()
+for uid in uids:
+    hdr = db[uid]
+    t = hdr.table()
+    plt.plot(t['WPS_scan_i0'], t['apb_ave_ch1_mean'], label=hdr.start['absorption'])
+plt.legend()
+
+uids = ['3fd0b682-865e-4f63-99a2-54fea7de6374',
+        '59c0c591-351e-44e5-b963-78e41e64eeae',
+        '9648432a-d6a0-4b5b-986d-2168864c94b4',
+        'd27ef2ac-5755-4cc7-8a03-296348a97c49',
+        '5ee3bbe2-754e-4239-86ee-a6f295f723c5']
+
+plt.figure()
+scaling = [2.8, 1.6, 0.8, 0.35, 0.35]
+for sids, sca in zip(uids, scaling):
+     hdr = db[sids]
+     t = hdr.table()
+     plt.plot(t['hhm_energy'], t['apb_ave_ch1']*sca)
+plt.yscale(u'log')
+
