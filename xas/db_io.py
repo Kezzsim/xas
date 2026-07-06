@@ -21,7 +21,17 @@ def load_apb_dataset_from_db(db, uid):
     # apb_dataset = apb_dataset[apb_dataset['timestamp'] > 1]   Lame attempt to clean up padding
     dataset_diff  = np.diff(apb_dataset['timestamp'])
 
-    array_of_zero_index = np.where(dataset_diff < 0)[0]
+    # array_of_zero_index = np.where(dataset_diff < 0)[0]
+    array_of_zero_index = np.where(dataset_diff < -0.01)[0]
+    # scan uid = 'ed77df59-48cf-44ed-b09d-861a11d5e4b7'
+    # In [32]: apb_dataset['timestamp'][647]
+    # Out[32]: 1782911883.0031967
+    #
+    # In [33]: apb_dataset['timestamp'][648]
+    # Out[33]: 1782911883.0083911
+    #
+    # In [34]: apb_dataset['timestamp'][649]
+    # Out[34]: 1782911883.005197 What is going on why recoded timestamp goes backward
 
     if array_of_zero_index.size == 0:
         padding_index = len(dataset_diff)
