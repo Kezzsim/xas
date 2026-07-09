@@ -4579,3 +4579,11 @@ for sids, sca in zip(uids, scaling):
      plt.plot(t['hhm_energy'], t['apb_ave_ch1']*sca)
 plt.yscale(u'log')
 
+
+
+x = xview_gui.widget_project
+indexes = x.list_project.selectedIndexes()
+plt.figure()
+for index in indexes:
+    ds = x.parent.project[index.row()]
+    plt.plot(ds.energy, ds.flat)

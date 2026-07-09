@@ -1,7 +1,7 @@
 # Temperature-conversion program using PyQt
 import numpy as np
 import matplotlib.pyplot as plt
-import pkg_resources
+# import pkg_resources
 import scipy.integrate
 from scipy import interpolate
 import math
