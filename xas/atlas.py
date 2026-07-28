@@ -373,8 +373,8 @@ def plot_crystal_energy_range(crystal, plot_height, lw_crystal=2, notch=0.15, lw
 
 
 crystal_radius = 50
-# curvature_radius = 1000
-curvature_radius = 500
+curvature_radius = 1000
+# curvature_radius = 500
 
 
 # make_figure_with_small_font(1, figsize=(60//2.54, 30/2.54), clear=True)
@@ -473,21 +473,22 @@ crystal_library = [{'material': 'Ge', 'hkl': [1, 0, 0], 'at_iss': True, 'color':
                    {'material': 'Ge', 'hkl': [1, 1, 1], 'at_iss': True, 'color': 'r'},
                    {'material' : 'Ge', 'hkl' : [2, 1, 1], 'at_iss' : True, 'color' : 'r'},
                    {'material': 'Ge', 'hkl': [3, 1, 0], 'at_iss': True, 'color': 'r'},
-                   # {'material' : 'Ge', 'hkl' : [3, 2, 1], 'at_iss' : False, 'color' : 'r'},
-                   # {'material' : 'Ge', 'hkl' : [3, 3, 1], 'at_iss' : False, 'color' : 'r'},
-                   #                   {'material' : 'Ge', 'hkl' : [3, 1, 1], 'at_iss' : False, 'color' : 'r'},
+                   {'material' : 'Ge', 'hkl' : [3, 2, 1], 'at_iss' : False, 'color' : 'r'},
+                   {'material' : 'Ge', 'hkl' : [3, 3, 1], 'at_iss' : False, 'color' : 'r'},
+                   {'material' : 'Ge', 'hkl' : [3, 1, 1], 'at_iss' : False, 'color' : 'r'},
                    {'material': 'Si', 'hkl': [1, 1, 1], 'at_iss': True, 'color': 'b'},
                    {'material': 'Si', 'hkl': [1, 1, 0], 'at_iss': True, 'color': 'b'},
-                   # {'material': 'Si', 'hkl': [1, 0, 0], 'at_iss': True, 'color': 'b'},
-                   # {'material' : 'Si', 'hkl' : [2, 1, 0], 'at_iss' : False, 'color' : 'b'},
+                   {'material': 'Si', 'hkl': [1, 0, 0], 'at_iss': False, 'color': 'b'},
+                   {'material' : 'Si', 'hkl' : [2, 1, 0], 'at_iss' : False, 'color' : 'b'},
                    {'material': 'Si', 'hkl': [2, 1, 1], 'at_iss': True, 'color': 'b'},
                    {'material': 'Si', 'hkl': [3, 1, 1], 'at_iss': True, 'color': 'b'},
                    {'material': 'Si', 'hkl': [3, 1, 0], 'at_iss': True, 'color': 'b'},
-                   # {'material' : 'Si', 'hkl' : [3, 2, 1], 'at_iss' : False, 'color' : 'b'},
+                   {'material' : 'Si', 'hkl' : [3, 2, 1], 'at_iss' : True, 'color' : 'b'},
+                   {'material': 'Si', 'hkl': [3, 3, 1], 'at_iss': True, 'color': 'b'},
                    {'material': 'Si', 'hkl': [5, 3, 1], 'at_iss': True, 'color': 'b'},
-                   # {'material' : 'Si', 'hkl' : [5, 5, 1], 'at_iss' : False, 'color' : 'b'}, # substitute for Si-444 for Ni-Kb, <5% better
-                   # {'material' : 'Si', 'hkl' : [5, 5, 3], 'at_iss' : False, 'color' : 'b'}, # substitue for Ge-800 for Cu-Kb, much worse
-                   # {'material' : 'Si', 'hkl' : [5, 2, 1], 'at_iss' : False, 'color' : 'b'},
+                   {'material' : 'Si', 'hkl' : [5, 5, 1], 'at_iss' : False, 'color' : 'b'}, # substitute for Si-444 for Ni-Kb, <5% better
+                   {'material' : 'Si', 'hkl' : [5, 5, 3], 'at_iss' : False, 'color' : 'b'}, # substitue for Ge-800 for Cu-Kb, much worse
+                   {'material' : 'Si', 'hkl' : [5, 2, 1], 'at_iss' : False, 'color' : 'b'},
                    {'material': 'Si', 'hkl': [7, 3, 3], 'at_iss': True, 'color': 'b'},
                    ]
 
