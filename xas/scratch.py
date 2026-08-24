@@ -68,7 +68,7 @@ for uid in range(265677, 265858+1):
 # Yet another attempt at combining the rixs planes
 
 x = xview_gui.widget_data
-
+from xas.file_io import load_binned_df_from_file
 rixs_dict = {}
 
 
@@ -4587,3 +4587,148 @@ plt.figure()
 for index in indexes:
     ds = x.parent.project[index.row()]
     plt.plot(ds.energy, ds.flat)
+
+
+
+from xas.file_io import load_binned_df_from_file
+uids = []
+for item in x.list_data.selectedItems():
+    fname = os.path.join(x.working_folder, item.text())
+    df, header = load_binned_df_from_file(fname)
+    print(fname, df.shape)
+    uid_idx1 = header.find('Scan.uid:') + 10
+    uid_idx2 = header.find('\n', header.find('Scan.uid:'))
+    uid = header[uid_idx1: uid_idx2]
+    uids.append(uid)
+
+key_entry = ['johann_main_crystal_motor_cr_main_roll', 'johann_aux2_crystal_motor_cr_aux2_roll']
+crystals = ['main', 'aux2']
+LUT = {}
+LUT['energy'] = [12645, 12647, 12649, 12651, 12653, 12655, 12657, 12659, 12661, 12663, 12665]
+
+for key, crystal in zip(key_entry, crystals):
+    a, b, c, d = analyze_linewidth_fly_scan(db, uid, rois=[3], x_key=key)
+    LUT[crystal] = [analyze_linewidth_fly_scan(db, uid, rois=[3], x_key=key)[3] for uid in uids]
+
+uids = ['39789757-f641-4700-80ef-154f5b6777cc',
+ '10cb5a41-f0f5-45c9-9df9-17cdd166791b',
+ '9ae36c3b-2cbf-4825-86b9-aa720e203832',
+ 'c9fb03df-e8e6-4842-9989-9e783b4ad231',
+ 'c7d45773-7cb4-4a74-ab34-2c8e7e7994d2',
+ 'd07c86fb-7690-4889-a471-912a4e298dbb',
+ 'bc8be569-972d-419f-991e-d9e9d3496442',
+ 'fd6952fd-19f3-49db-ae5c-db44dd4a3242',
+ '4d7c6a26-8f05-499c-a214-f5f27f4e1d5e',
+ '54fa862e-2c93-45df-8949-d16bd9f47791',
+ 'c6f05973-fcd1-4a05-8998-f51c7e489acd']
+
+
+
+
+LUT = {'energy': [12645,
+  12647,
+  12649,
+  12651,
+  12653,
+  12655,
+  12657,
+  12659,
+  12661,
+  12663,
+  12665],
+ 'main': [391.03828296195616,
+  346.63276492027194,
+  297.507765089212,
+  257.41481295206256,
+  210.48700891990129,
+  167.68929223470892,
+  122.2701657391274,
+  77.58315356326722,
+  34.90837617712876,
+  -9.266794183172324,
+  -52.36098466240465],
+ 'aux2': [-139.86769560126348,
+  -184.35425182515647,
+  -223.85633039533477,
+  -273.4855059364299,
+  -312.02386792549106,
+  -354.5198600978057,
+  -400.71462093588144,
+  -445.1025316180406,
+  -487.98200720920715,
+  -531.9647608349758,
+  -573.0856089412798]}
+
+from xas.spectrometer import convert_roll_to_energy_for_johann_fly_scan
+from xas.process import get_processed_df_from_uid
+
+
+path = '/nsls2/auto-storage/iss/legacy/processed/2026/2/317954/roll_to_energy/'
+
+def get_clean_dataframe(dataframe=None, crystal='main'):
+    dataframe = dataframe.copy()
+    crystals = ['main', 'aux2', 'aux3', 'aux4', 'aux5']
+    crystals_that_requires_to_be_removed = [cry for cry in crystals if cry != crystal]
+    for cry in crystals_that_requires_to_be_removed:
+        energy_base = f"energy_{cry}"
+        if energy_base in dataframe.columns:
+            dataframe.pop(energy_base)
+    # print(dataframe.columns)
+    energy_base = f"energy_{crystal}"
+    col = dataframe.pop(energy_base)
+    dataframe.insert(0, energy_base, col)
+    return dataframe
+
+
+for uid in uids:
+    print(f">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>{uid}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+    _, df, _, _, _, file, _ = get_processed_df_from_uid(uid, db, save_interpolated_file=False)
+    print(f">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>{file[0]}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+    hdr = db[uid]
+    interpolated_df, energy_key = convert_roll_to_energy_for_johann_fly_scan(df, hdr, LUT=LUT)
+    filename = os.path.basename(file[0])
+    crystals = ['main', 'aux2']
+    for crystal in crystals:
+        energy_base = f"energy_{crystal}"
+        file_name = f"{crystal}_" + filename[:-4]  + ".dat"
+        dataframe = get_clean_dataframe(interpolated_df, crystal)
+        np.savetxt(path + file_name, dataframe.to_numpy(), header=" ".join(dataframe.columns))
+
+
+
+df['timestamp'] = (df.time.values - np.datetime64('1970-01-01T00:00:00Z')) / np.timedelta64(1, 's')
+interpolator_func = interp1d(df['timestamp'].values, df[_stream_name].values, axis=0, kind='quadratic')
+fine_timestamp = np.linspace(df['timestamp'].min(), df['timestamp'].max(), int((df['timestamp'].max() - df['timestamp'].min()) * 500))
+motor_pos_fine = interpolator_func(fine_timestamp)
+
+
+
+monitor_dict = {_stream_name : pd.DataFrame({'timestamp': fine_timestamp,
+                                               _stream_name: motor_pos_fine})}
+
+
+for uid in uids:
+    print(f">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>{uid}<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+    hdr = db[uid]
+    t = hdr.table(stream_name='apb_stream', fill=True)
+    print(t['apb_stream'][1]['timestamp'])
+    print(np.where(t['apb_stream'][1]['timestamp'] < 0))
+
+
+from xas.db_io import load_apb_dataset_from_db, translate_apb_dataset, load_apb_trig_dataset_from_db, load_xs3_dataset_from_db, load_pil100k_dataset_from_db, load_apb_dataset_only_from_db, translate_apb_only_dataset, load_xia_dataset_from_db
+from xas.process import clean_dict
+from xas.interpolate import interpolate
+raw_dict = {}
+apb_df = load_apb_dataset_only_from_db(db, uid)
+raw_dict = {**raw_dict, **translate_apb_only_dataset(apb_df)}
+stream_name = 'pil100k2_stream'
+pil100k_stream_name = 'pil100k2_stream'
+pil100k_name = stream_name.split('_')[0]
+apb_trigger_stream_name = f'apb_trigger_{pil100k_name}'
+apb_trigger_pil100k_timestamps = load_apb_trig_dataset_from_db(db, uid, use_fall=True, stream_name=apb_trigger_stream_name)
+pil100k_dict = load_pil100k_dataset_from_db(db, uid, apb_trigger_pil100k_timestamps,
+                                                              pil100k_stream_name=pil100k_stream_name,
+                                                              load_images=False)
+raw_dict = {**raw_dict, **pil100k_dict}
+raw_dict = clean_dict(raw_dict)
+interpolated_df = interpolate(raw_dict, sort=False)

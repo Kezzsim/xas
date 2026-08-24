@@ -231,7 +231,7 @@ def get_processed_df_from_uid(uid, db, logger=None, draw_func_interp=None, draw_
 
     elif experiment == 'epics_fly_scan':
         logger.info(f'({ttime.ctime()}) Processing EPICS fly scan')
-        processed_df = get_processed_df_from_uid_for_epics_fly_scan(db, uid, save_interpolated_file=True,
+        processed_df = get_processed_df_from_uid_for_epics_fly_scan(db, uid, save_interpolated_file=save_interpolated_file,
                                                                     path_to_file=path_to_file,
                                                                     comments=comments, load_images=load_images,
                                                                     processing_kwargs=processing_kwargs)
@@ -304,7 +304,7 @@ def process_interpolate_unsorted(uid, db):
      interpolated_df = interpolate(raw_df, sort=False)
      return interpolated_df
 
-def clean_dict(raw_dict):
+def clean_dict_old(raw_dict):
     clean_raw_dict = {}
     for key in raw_dict.keys():
         df = raw_dict[key]
@@ -315,6 +315,20 @@ def clean_dict(raw_dict):
             clean_raw_dict[key] = df.loc[:zero_idx - 1]
     return clean_raw_dict
 
+
+def clean_dict(raw_dict):
+    clean_raw_dict = {}
+
+    for key, df in raw_dict.items():
+        invalid = df["timestamp"] < 1e9
+
+        if invalid.any():
+            first_bad = invalid.idxmax()
+            clean_raw_dict[key] = df.loc[:first_bad - 1].copy()
+        else:
+            clean_raw_dict[key] = df.copy()
+
+    return clean_raw_dict
 
 
 def get_processed_df_from_uid_for_epics_fly_scan(db, uid, save_interpolated_file=False, path_to_file=None,
@@ -365,7 +379,6 @@ def get_processed_df_from_uid_for_epics_fly_scan(db, uid, save_interpolated_file
                 df = hdr.table(stream_name)
                 logger.info(f'({ttime.ctime()}) Monitor data received')
                 df['timestamp'] = (df.time.values - np.datetime64('1970-01-01T00:00:00Z')) / np.timedelta64(1, 's')
-
                 interpolator_func = interp1d(df['timestamp'].values, df[_stream_name].values, axis=0, kind='quadratic')
                 fine_timestamp = np.linspace(df['timestamp'].min(), df['timestamp'].max(), int((df['timestamp'].max() - df['timestamp'].min()) * 500))
                 motor_pos_fine = interpolator_func(fine_timestamp)
