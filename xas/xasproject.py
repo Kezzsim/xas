@@ -14,7 +14,7 @@ class XASDataSet:
     _larch = Interpreter()
 
     def __init__(self, name=None, md=None, energy = None, mu=None,
-                 filename=None, datatype=None, process=True,
+                 filename=None, datatype=None, process=True, deltaE=0,
                  xasdataset=None, ext_data=None, df=None,
                  *args, **kwargs):
         self.larch = xafsgroup()
@@ -26,6 +26,7 @@ class XASDataSet:
                 edge = md['edge']
                 self.larch.e0 = int(edge[edge.find('(') + 1: edge.find(')')])
 
+        self.deltaE = deltaE
         if mu is not None:
             self.larch.mu = np.array(mu)
             self._mu = np.array(mu)
